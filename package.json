@@ -1,0 +1,33 @@
+{
+  "name": "@brootal/core",
+  "version": "0.11.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "gitHooks": {
+    "pre-commit": "sh patch_version.sh",
+    "post-merge": "sh patch_version_with_commit.sh"
+  },
+  "author": "Anton Nosenko",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^4.3.1",
+    "express-fileupload": "^1.2.1",
+    "http-proxy-middleware": "^1.0.6",
+    "lodash": "^4.17.20",
+    "mongoose-to-swagger": "^1.1.1",
+    "node-fetch": "^2.6.1",
+    "role-acl": "^4.5.4",
+    "swagger-ui-express": "^4.1.6"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/cli": "^7.12.13",
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "yorkie": "^2.0.0"
+  }
+}

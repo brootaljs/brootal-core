@@ -1,0 +1,12 @@
+image: node:15.4
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - npm i
+    - npm run build
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}">.npmrc
+    - NPM_TOKEN=${NPM_TOKEN} npm publish

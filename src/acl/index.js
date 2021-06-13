@@ -1,4 +1,5 @@
 const AccessControl = require('role-acl');
+const _ = require('lodash');
 
 export default {
     async initialize(app, roleServiceName) {
@@ -13,7 +14,17 @@ export default {
     },
     checkPermissionByUserAndRemote(app, service, user, serviceMethod, remote) {
         let roles = ['$authorized', ...(user.roles || [])];
-        let actions = [serviceMethod, ...(remote.aclGroup || [])]
+
+        let groups = [];
+        if (remote.group) {
+            if (_.isArray(remote.group)) {
+                groups = remote.group.map((g) => `group:${g}`)
+            } else {
+                groups = [`group:${remote.group}`]
+            }
+        }
+
+        let actions = [serviceMethod, ...groups]
         return this.checkPermission(app, service, actions, roles);
     },
     async checkPermission(app, service, actions, roles) {

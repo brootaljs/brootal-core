@@ -18,7 +18,8 @@ export default {
                     source: 'query' 
                 }
             }
-        ]
+        ],
+        group: 'read'
     },
     create: {
         static: true,
@@ -40,7 +41,8 @@ export default {
                     source: 'body'
                 }
             }
-        ]
+        ],
+        group: 'write'
     },
     count: {
         static: true,
@@ -55,7 +57,8 @@ export default {
                 }
             }
         ],
-        prepare: (count) => ({count})
+        prepare: (count) => ({count}),
+        group: 'read'
     },
     exists: {
         static: true,
@@ -70,7 +73,8 @@ export default {
                 }
             }
         ],
-        prepare: (exists) => ({exists})
+        prepare: (exists) => ({exists}),
+        group: 'read'
     },
     deleteOne: {
         static: true,
@@ -90,7 +94,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'delete'
     },
     deleteMany: {
         static: true,
@@ -110,7 +115,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'delete'
     },
     findById: {
         static: true,
@@ -131,7 +137,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'read'
     },
     findByIdAndUpdate: {
         static: true,
@@ -160,7 +167,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'write'
     },
     findByIdAndDelete: {
         static: true,
@@ -181,7 +189,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'delete'
     },
     findOne: {
         static: true,
@@ -201,7 +210,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'read'
     },
     findOneAndDelete: {
         static: true,
@@ -221,7 +231,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'delete'
     },
     findOneAndUpdate: {
         static: true,
@@ -248,7 +259,8 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'write'
     },
     findOneAndReplace: {
         static: true,
@@ -276,6 +288,7 @@ export default {
                     source: 'query'
                 }
             }
-        ]
+        ],
+        group: 'write'
     }
 }

@@ -12,8 +12,8 @@ export default {
 
         app.acl = new AccessControl(grantsObject);
     },
-    checkPermissionByUserAndRemote(app, service, user, serviceMethod, remote) {
-        let roles = ['$authorized', ...(user.roles || [])];
+    checkPermissionByUserAndRemote(app, service, user, serviceMethod, remote, additionalRoles) {
+        let roles = [...additionalRoles, ...(user.roles || [])];
 
         let groups = [];
         if (remote.group) {

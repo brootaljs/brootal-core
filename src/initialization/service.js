@@ -70,16 +70,20 @@ const createService = async function(app, serviceName, service, options) {
                 try {
                     if (options.acl && (!options.acl.onlyIfHeader || req.headers[options.acl.onlyIfHeader.toLowerCase()])) {
                         if (!req.user) {
-                            return res.status(401).json({
-                                error: 'Unauthorized'
-                            });
+                            let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, {}, remoteServiceMethod, remote, ['$unauthorized']);
+                            if (!permission.granted) {
+                                return res.status(401).json({
+                                    error: 'Unauthorized'
+                                });
+                            }
+                        } else {
+                            let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, req.user, remoteServiceMethod, remote, ['$authorized']);
+                            if (!permission.granted) {
+                                return res.status(403).json({
+                                    error: 'Permission denied'
+                                })
+                            };
                         }
-                        let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, req.user, remoteServiceMethod, remote);
-                        if (!permission.granted) {
-                            return res.status(403).json({
-                                error: 'Permission denied'
-                            })
-                        };
                     }
 
                     let result = await service[remoteServiceMethod](...getArgsFromReq(req, remote.accepts), req, res);
@@ -98,16 +102,20 @@ const createService = async function(app, serviceName, service, options) {
                 try {
                     if (options.acl && (!options.acl.onlyIfHeader || req.headers[options.acl.onlyIfHeader.toLowerCase()])) {
                         if (!req.user) {
-                            return res.status(401).json({
-                                error: 'Unauthorized'
-                            });
+                            let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, {}, remoteServiceMethod, remote, ['$unauthorized']);
+                            if (!permission.granted) {
+                                return res.status(401).json({
+                                    error: 'Unauthorized'
+                                });
+                            }
+                        } else {
+                            let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, req.user, remoteServiceMethod, remote, ['$authorized']);
+                            if (!permission.granted) {
+                                return res.status(403).json({
+                                    error: 'Permission denied'
+                                })
+                            };
                         }
-                        let permission = await app.__aclHelper.checkPermissionByUserAndRemote(app, serviceName, req.user, remoteServiceMethod, remote);
-                        if (!permission.granted) {
-                            return res.status(403).json({
-                                error: 'Permission denied'
-                            })
-                        };
                     }
 
                     let item = await service.findById(req.params.__id);

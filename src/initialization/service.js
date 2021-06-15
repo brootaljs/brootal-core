@@ -54,7 +54,7 @@ const sortRoutes = function(remotes, serviceName) {
 
 const createService = async function(app, serviceName, service, options) {
     app.services[serviceName] = service;
-    const remotes = require(`../../../../services/${serviceName}/${serviceName}.remote.js`).default;
+    const remotes = require(`../../../../../services/${serviceName}/${serviceName}.remote.js`).default;
     app.get(`/remotes/${serviceName}`, async (req, res) => {
         try {
             res.send(remotes);
@@ -211,7 +211,7 @@ const createRemoteService = async function(app, serviceName, service) {
 export default async function(app, options) {
     app.services = {};
     
-    const directoryPath = path.join(__dirname, '../../../../services');
+    const directoryPath = path.join(__dirname, '../../../../../services');
     let serviceNames = fs.readdirSync(directoryPath);
     log('Service Names', serviceNames);
     if (options.acl) {
@@ -219,7 +219,7 @@ export default async function(app, options) {
         let removed = _.remove(serviceNames, (s) => s === roleServiceName);
         if (removed.length === 0) throw 'No Role Service Find';
 
-        let roleService = require(`../../../../services/${roleServiceName}/${roleServiceName}.class.js`).default;
+        let roleService = require(`../../../../../services/${roleServiceName}/${roleServiceName}.class.js`).default;
         if (roleService.__isRemote) {
             await createRemoteService(app, roleServiceName, roleService);
         }
@@ -230,7 +230,7 @@ export default async function(app, options) {
     }
     await Promise.all(serviceNames.map(async function (serviceName) {
         if (serviceName != '.DS_Store') {
-            const service = require(`../../../../services/${serviceName}/${serviceName}.class.js`).default;
+            const service = require(`../../../../../services/${serviceName}/${serviceName}.class.js`).default;
             if (service.__isRemote) {
                 return await createRemoteService(app, serviceName, service, options);
             }

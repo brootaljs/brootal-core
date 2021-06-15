@@ -14,7 +14,7 @@ const connectTest = async (MongoMemoryServer, datasource) => {
 }
 
 export default async (app, options) => {
-    const datasources = require('../../../../server/datasources.json')
+    const datasources = require('../../../../../server/datasources.json')
     let datasourceNames = Object.keys(datasources);
     app.datasources = {};
     if (process.env.NODE_ENV === 'test' || options.isTest) {

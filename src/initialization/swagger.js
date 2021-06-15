@@ -4,7 +4,7 @@ import { forEach } from 'lodash';
 import m2s from 'mongoose-to-swagger';
 
 function getInfoData(swaggerData) {
-    let packageInfo = require('../../../../package.json');
+    let packageInfo = require('../../../../../package.json');
 
     swaggerData.info = {
         "description": packageInfo.description,
@@ -23,7 +23,7 @@ function getPathsData(swaggerData, serviceNames) {
             name: serviceName
         });
 
-        const remotes = require(`../../../../services/${serviceName}/${serviceName}.remote.js`).default;
+        const remotes = require(`../../../../../services/${serviceName}/${serviceName}.remote.js`).default;
 
         
         const remoteServiceMethods = Object.keys(remotes);
@@ -107,7 +107,7 @@ function getModelData(swaggerData, serviceNames) {
     forEach(serviceNames, (serviceName) => {
         let model;
         try {
-            model = require(`../../../../services/${serviceName}/${serviceName}.model.js`).model;
+            model = require(`../../../../../services/${serviceName}/${serviceName}.model.js`).model;
         } catch (err) {}
 
         if (model) {
@@ -134,7 +134,7 @@ export default function(app, options = {}) {
         }
     };
 
-    const directoryPath = path.join(__dirname, '../../../../services');
+    const directoryPath = path.join(__dirname, '../../../../../services');
     let serviceNames = fs.readdirSync(directoryPath);
 
     getInfoData(swaggerData);

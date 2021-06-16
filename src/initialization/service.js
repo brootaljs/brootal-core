@@ -221,9 +221,9 @@ export default async function(app, options) {
 
         let roleService = require(`../../../../../services/${roleServiceName}/${roleServiceName}.class.js`).default;
         if (roleService.__isRemote) {
-            await createRemoteService(app, roleServiceName, roleService);
+            await createRemoteService(app, roleServiceName, roleService, options);
         }
-        await createService(app, roleServiceName, roleService);
+        await createService(app, roleServiceName, roleService, options);
 
         app.__aclHelper = acl;
         await app.__aclHelper.initialize(app, roleServiceName);

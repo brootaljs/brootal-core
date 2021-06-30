@@ -152,7 +152,26 @@ const createRemoteService = async function(app, serviceName, service) {
     app.use(`/${serviceName}`, createProxyMiddleware({ 
         target: `http://${service.__url}/${service.__service}`, 
         changeOrigin: true,
-        pathRewrite
+        pathRewrite,
+        onProxyReq: (proxyReq, req, res) => {
+            if (!req.body || !Object.keys(req.body).length) {
+              return;
+            }
+          
+            const contentType = proxyReq.getHeader('Content-Type');
+            const writeBody = (bodyData) => {
+              proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+              proxyReq.write(bodyData);
+            };
+          
+            if (contentType.includes('application/json')) {
+              writeBody(JSON.stringify(req.body));
+            }
+          
+            if (contentType.includes('application/x-www-form-urlencoded')) {
+              writeBody(querystring.stringify(req.body));
+            }
+          }
     }));
 
     const remoteServiceMethods = sortRoutes(remotes, serviceName);

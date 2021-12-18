@@ -89,7 +89,11 @@ const createService = async function(app, serviceName, service, options) {
                     let result = await service[remoteServiceMethod](...getArgsFromReq(req, remote.accepts), req, res);
 
                     log(`Result of /${serviceName}${remote.remote}`, result);
-                    res.send(remote.prepare ? remote.prepare(result) : result);
+                    if (result === null) {
+                        res.status(204).send(null);
+                    } else {
+                        res.send(remote.prepare ? remote.prepare(result) : result);
+                    }
                 } catch(err) {
                     error(`Error of /${serviceName}${remote.remote}`, err);
                     res.status(500).json({
@@ -122,7 +126,11 @@ const createService = async function(app, serviceName, service, options) {
                     let result = await item[remoteServiceMethod](...getArgsFromReq(req, remote.accepts), req, res);
 
                     log(`Result of /${serviceName}/:__id${remote.remote}`, result);
-                    res.send(remote.prepare ? remote.prepare(result) : result);
+                    if (result === null) {
+                        res.status(204).send(null);
+                    } else {
+                        res.send(remote.prepare ? remote.prepare(result) : result);
+                    }
                 } catch(err) {
                     error(`Error of /${serviceName}/:__id${remote.remote}`, err);
                     res.status(500).json({
@@ -217,8 +225,9 @@ const createRemoteService = async function(app, serviceName, service) {
             // Fix error for GET requests with body
             if (body) opts.body = JSON.stringify(body);
             let result = await fetch(url, opts);
-
-            return result.json();
+            
+            if (result.status === 200) return result.json();
+            return null;
         }
     })
 

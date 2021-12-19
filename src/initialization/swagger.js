@@ -7,14 +7,13 @@ function getInfoData(swaggerData) {
     let packageInfo = require('../../../../../package.json');
 
     swaggerData.info = {
-        "description": packageInfo.description,
-        "version": packageInfo.version,
-        "title": packageInfo.name.toUpperCase()
-    }
+        'description': packageInfo.description,
+        'version': packageInfo.version,
+        'title': packageInfo.name.toUpperCase()
+    };
 }
 
 function getPathsData(swaggerData, serviceNames) {
-
     swaggerData.tags = [];
     swaggerData.paths = {};
 
@@ -25,11 +24,12 @@ function getPathsData(swaggerData, serviceNames) {
 
         const remotes = require(`../../../../../services/${serviceName}/${serviceName}.remote.js`).default;
 
-        
         const remoteServiceMethods = Object.keys(remotes);
         remoteServiceMethods.forEach(function (remoteServiceMethod) {
             let remote = remotes[remoteServiceMethod];
-            let path = remote.static ? `/${serviceName}${remote.remote}` : `/${serviceName}/{id}${remote.remote}`;
+            let path = remote.static
+                ? `/${serviceName}${remote.remote}`
+                : `/${serviceName}/{id}${remote.remote}`;
 
             let parameters = remote.accepts.map((accept) => {
                 if (accept.http.source === 'params' ) {
@@ -38,20 +38,27 @@ function getPathsData(swaggerData, serviceNames) {
                 }
 
                 let param = {
-                    "name": accept.arg,
-                    "in": accept.http.source === 'params' ? 'path' : accept.http.source,
-                    "description": accept.description,
-                    "required": accept.required,
-                    "type": accept.type,
-                    "schema": accept.isCurrentModelSchema ? {
-                        "$ref": `#/definitions/${serviceName}`
-                    } : (accept.modelSchema ? {
-                        "$ref": `#/definitions/${accept.modelSchema}`
-                    } : accept.schema)
+                    'name': accept.arg,
+                    'in': accept.http.source === 'params'
+                        ? 'path'
+                        : accept.http.source,
+                    'description': accept.description,
+                    'required': accept.required,
+                    'type': accept.type,
+                    'schema': accept.isCurrentModelSchema
+                        ? {
+                            '$ref': `#/definitions/${serviceName}`
+                        }
+                        : (accept.modelSchema
+                            ? {
+                                '$ref': `#/definitions/${accept.modelSchema}`
+                            }
+                            : accept.schema)
+                };
+
+                if (param.type === 'array') {
+                    param.items = {};
                 }
-
-
-                if (param.type === 'array') param.items = {};
                 if (param.type === 'file') {
                     param.type = 'string';
                     param.format = 'binary';
@@ -59,46 +66,47 @@ function getPathsData(swaggerData, serviceNames) {
 
                 return param;
             });
-            
+
             if (!swaggerData.paths[path]) {
                 swaggerData.paths[path] = {};
             }
 
             swaggerData.paths[path][remote.method] = {
-                "security": [
+                'security': [
                     {
-                        "Bearer": []
+                        'Bearer': []
                     }
                 ],
                 tags: [serviceName],
-                summary: 'Service method '+remoteServiceMethod,
-                description: 'Service method '+remoteServiceMethod,
+                summary: `Service method ${remoteServiceMethod}`,
+                description: `Service method ${remoteServiceMethod}`,
                 operationId: remoteServiceMethod,
                 produces: [
-                    "application/json"
+                    'application/json'
                 ],
                 consumes: [
-                    "application/json"
+                    'application/json'
                 ],
-                parameters: remote.static ? parameters : [
-                    {
-                        name: "id",
-                        in: "path",
-                        description: `ID of ${serviceName}`,
-                        required: true,
-                        type: "string"
-                    },
-                    ...parameters
-                ],
+                parameters: remote.static
+                    ? parameters
+                    : [
+                        {
+                            name: 'id',
+                            in: 'path',
+                            description: `ID of ${serviceName}`,
+                            required: true,
+                            type: 'string'
+                        },
+                        ...parameters
+                    ],
                 responses: {
-                    "200": {
-                        "description": "Successful operation"
+                    '200': {
+                        'description': 'Successful operation'
                     }
                 }
-            }
-
+            };
         });
-    })
+    });
 }
 
 function getModelData(swaggerData, serviceNames) {
@@ -118,18 +126,18 @@ function getModelData(swaggerData, serviceNames) {
 
 export default function(app, options = {}) {
     const swaggerData = {
-        "swagger": "2.0",
-        "basePath": options.basePath || '/',
-        "schemes": [
-            "http",
-            "https"
+        'swagger': '2.0',
+        'basePath': options.basePath || '/',
+        'schemes': [
+            'http',
+            'https'
         ],
-        "securityDefinitions": {
-            "Bearer": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "Authorization",
-                "template": "Bearer {apiKey}"
+        'securityDefinitions': {
+            'Bearer': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'template': 'Bearer {apiKey}'
             }
         }
     };
@@ -145,7 +153,7 @@ export default function(app, options = {}) {
 
     var options = {
         swaggerOptions: {
-            docExpansion:"none"
+            docExpansion:'none'
         }
     };
     app.use('/explorer', swaggerUi.serve, swaggerUi.setup(swaggerData, options));

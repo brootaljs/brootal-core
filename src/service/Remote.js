@@ -8,14 +8,14 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             },
             {
                 arg: 'include',
                 type: 'array',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }
         ],
@@ -32,7 +32,7 @@ export default {
                 type: 'object',
                 isCurrentModelSchema: true,
                 http: {
-                    source: 'body' 
+                    source: 'body'
                 }
             }, {
                 arg: 'options',
@@ -53,11 +53,11 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }
         ],
-        prepare: (count) => ({count}),
+        prepare: (count) => ({ count }),
         group: 'read'
     },
     exists: {
@@ -69,11 +69,11 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }
         ],
-        prepare: (exists) => ({exists}),
+        prepare: (exists) => ({ exists }),
         group: 'read'
     },
     deleteOne: {
@@ -127,7 +127,7 @@ export default {
                 arg: 'id',
                 type: 'string',
                 http: {
-                    source: 'params' 
+                    source: 'params'
                 },
                 required: true
             }, {
@@ -149,7 +149,7 @@ export default {
                 arg: 'id',
                 type: 'string',
                 http: {
-                    source: 'params' 
+                    source: 'params'
                 },
                 required: true
             }, {
@@ -179,7 +179,7 @@ export default {
                 arg: 'id',
                 type: 'string',
                 http: {
-                    source: 'params' 
+                    source: 'params'
                 },
                 required: true
             }, {
@@ -201,7 +201,7 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }, {
                 arg: 'include',
@@ -222,7 +222,7 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }, {
                 arg: 'options',
@@ -243,7 +243,7 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }, {
                 arg: 'data',
@@ -271,7 +271,7 @@ export default {
                 arg: 'filter',
                 type: 'object',
                 http: {
-                    source: 'query' 
+                    source: 'query'
                 }
             }, {
                 arg: 'data',
@@ -291,4 +291,4 @@ export default {
         ],
         group: 'write'
     }
-}
+};

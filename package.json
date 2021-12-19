@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d dist"
+    "build": "babel src -d dist",
+    "lint": "eslint --ext .js src/",
+    "lint:fix": "eslint --fix --ext .js src/"
   },
   "gitHooks": {
     "pre-commit": "sh patch_version.sh",
@@ -24,10 +26,12 @@
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/cli": "^7.12.13",
     "@babel/core": "^7.12.13",
+    "@babel/eslint-parser": "^7.16.5",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/preset-env": "^7.12.13",
+    "eslint": "^8.5.0",
     "yorkie": "^2.0.0"
   }
 }

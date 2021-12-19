@@ -3,5 +3,5 @@ export default function(url, service) {
         static __url = url
         static __service = service
         static __isRemote = true
-    }
+    };
 }

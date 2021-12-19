@@ -17,7 +17,7 @@ const defaultOptions = {
     fileUploadOpts: {
         limits: { fileSize: 50 * 1024 * 1024 }
     }
-}
+};
 
 export {
     Remote,
@@ -30,12 +30,20 @@ export default {
         options = {
             ...defaultOptions,
             ...(options || {})
+        };
+
+        if (options.useFileUpload) {
+            app.use(fileUpload(options.fileUploadOpts));
         }
 
-        if (options.useFileUpload) app.use(fileUpload(options.fileUploadOpts));
-
-        if (options.initDatasources) await datasource(app, options);
-        if (options.initServices) await service(app, options);
-        if (options.initSwagger) swagger(app, options);
+        if (options.initDatasources) {
+            await datasource(app, options);
+        }
+        if (options.initServices) {
+            await service(app, options);
+        }
+        if (options.initSwagger) {
+            swagger(app, options);
+        }
     }
-}
+};

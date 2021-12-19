@@ -6,4 +6,4 @@ export default (classForExtend, plugin) => {
     if (plugin.protoMethods) {
         Object.assign(classForExtend.prototype, plugin.protoMethods);
     }
-}
+};

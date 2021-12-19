@@ -14,26 +14,27 @@ const error = debug('Engine:Service:ERROR');
 const log = debug('Engine:Service');
 
 const getArgsFromReq = function(req, accepts) {
-    return accepts.map(accept => {
+    return accepts.map((accept) => {
         let http = accept.http || {};
         switch (http.source) {
-            case 'body':
-                return req.body[accept.arg]
-            case 'params':
-                return req.params[accept.arg]
-            case 'file':
-                return req.files[accept.arg]
-            case 'query':
-            default:
-                // parse filter from qs
-                let buf = req.query[accept.arg];
-                try {
-                    buf = JSON.parse(buf);
-                } catch(e) { }
-                return buf;
+        case 'body':
+            return req.body[accept.arg];
+        case 'params':
+            return req.params[accept.arg];
+        case 'file':
+            return req.files[accept.arg];
+        case 'query':
+        default:
+            // parse filter from qs
+            let buf = req.query[accept.arg];
+            try {
+                buf = JSON.parse(buf);
+            } catch(e) { }
+
+            return buf;
         }
     });
-}
+};
 
 // express router don't check all routes to find corresponding to request,
 // it checks routes from first registered to last, until it find first that match and drops rest
@@ -43,14 +44,18 @@ const getArgsFromReq = function(req, accepts) {
 const sortRoutes = function(remotes, serviceName) {
     return Object.keys(remotes).sort((a,b) => {
         const ar = remotes[a];
-        const ap = ar.static ? "/".concat(serviceName).concat(ar.remote) : "/".concat(serviceName, "/:__id").concat(ar.remote);
-  
+        const ap = ar.static
+            ? '/'.concat(serviceName).concat(ar.remote)
+            : '/'.concat(serviceName, '/:__id').concat(ar.remote);
+
         const br = remotes[b];
-        const bp = br.static ? "/".concat(serviceName).concat(br.remote) : "/".concat(serviceName, "/:__id").concat(br.remote);
-  
+        const bp = br.static
+            ? '/'.concat(serviceName).concat(br.remote)
+            : '/'.concat(serviceName, '/:__id').concat(br.remote);
+
         return bp.length - ap.length;
     });
-}
+};
 
 const createService = async function(app, serviceName, service, options) {
     app.services[serviceName] = service;
@@ -65,7 +70,7 @@ const createService = async function(app, serviceName, service, options) {
     const remoteServiceMethods = sortRoutes(remotes, serviceName);
     remoteServiceMethods.forEach(function (remoteServiceMethod) {
         let remote = remotes[remoteServiceMethod];
-        if (remote.static) { 
+        if (remote.static) {
             app[remote.method](`/${serviceName}${remote.remote}`, async (req, res) => {
                 try {
                     if (options.acl && (!options.acl.onlyIfHeader || req.headers[options.acl.onlyIfHeader.toLowerCase()])) {
@@ -81,7 +86,7 @@ const createService = async function(app, serviceName, service, options) {
                             if (!permission.granted) {
                                 return res.status(403).json({
                                     error: 'Permission denied'
-                                })
+                                });
                             };
                         }
                     }
@@ -92,12 +97,18 @@ const createService = async function(app, serviceName, service, options) {
                     if (result === null) {
                         res.status(204).send(null);
                     } else {
-                        res.send(remote.prepare ? remote.prepare(result) : result);
+                        res.send(remote.prepare
+                            ? remote.prepare(result)
+                            : result);
                     }
                 } catch(err) {
                     error(`Error of /${serviceName}${remote.remote}`, err);
                     res.status(500).json({
-                        error: err ? (typeof err === 'object' ? err.toString() : err) : 'Something went wrong, please try again later'
+                        error: err
+                            ? (typeof err === 'object'
+                                ? err.toString()
+                                : err)
+                            : 'Something went wrong, please try again later'
                     });
                 }
             });
@@ -117,7 +128,7 @@ const createService = async function(app, serviceName, service, options) {
                             if (!permission.granted) {
                                 return res.status(403).json({
                                     error: 'Permission denied'
-                                })
+                                });
                             };
                         }
                     }
@@ -129,19 +140,24 @@ const createService = async function(app, serviceName, service, options) {
                     if (result === null) {
                         res.status(204).send(null);
                     } else {
-                        res.send(remote.prepare ? remote.prepare(result) : result);
+                        res.send(remote.prepare
+                            ? remote.prepare(result)
+                            : result);
                     }
                 } catch(err) {
                     error(`Error of /${serviceName}/:__id${remote.remote}`, err);
                     res.status(500).json({
-                        error: err ? (typeof err === 'object' ? err.toString() : err) : 'Something went wrong, please try again later'
+                        error: err
+                            ? (typeof err === 'object'
+                                ? err.toString()
+                                : err)
+                            : 'Something went wrong, please try again later'
                     });
                 }
             });
         }
     });
-
-}
+};
 
 const createRemoteService = async function(app, serviceName, service) {
     let remotes = await fetch(`http://${service.__url}/remotes/${service.__service}`);
@@ -157,29 +173,29 @@ const createRemoteService = async function(app, serviceName, service) {
 
     let pathRewrite = {};
     pathRewrite[`^/${serviceName}`] = '/';
-    app.use(`/${serviceName}`, createProxyMiddleware({ 
-        target: `http://${service.__url}/${service.__service}`, 
+    app.use(`/${serviceName}`, createProxyMiddleware({
+        target: `http://${service.__url}/${service.__service}`,
         changeOrigin: true,
         pathRewrite,
         onProxyReq: (proxyReq, req, res) => {
             if (!req.body || !Object.keys(req.body).length) {
-              return;
+                return;
             }
-          
+
             const contentType = proxyReq.getHeader('Content-Type');
             const writeBody = (bodyData) => {
-              proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-              proxyReq.write(bodyData);
+                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                proxyReq.write(bodyData);
             };
-          
+
             if (contentType.includes('application/json')) {
-              writeBody(JSON.stringify(req.body));
+                writeBody(JSON.stringify(req.body));
             }
-          
+
             if (contentType.includes('application/x-www-form-urlencoded')) {
-              writeBody(querystring.stringify(req.body));
+                writeBody(querystring.stringify(req.body));
             }
-          }
+        }
     }));
 
     const remoteServiceMethods = sortRoutes(remotes, serviceName);
@@ -188,25 +204,29 @@ const createRemoteService = async function(app, serviceName, service) {
 
         service[remoteServiceMethod] = async (...args) => {
             let remote = service.__remotes[remoteServiceMethod];
-            let path = `http://${service.__url}/${service.__service}${remote.static?'':`/${args.shift()}`}${remote.remote}`;
+            let path = `http://${service.__url}/${service.__service}${remote.static
+                ?''
+                :`/${args.shift()}`}${remote.remote}`;
             let queryParameters = {};
             let body;
 
             for(let i=0; i<args.length && i<remote.accepts.length; i++) {
                 switch (remote.accepts[i].http.source) {
-                    case 'params':
-                        path = path.replace(new RegExp(`:${remote.accepts[i].arg}\/`, 'g'), `${args[i]}/`);
-                        path = path.replace(new RegExp(`:${remote.accepts[i].arg}$`, 'g'), `${args[i]}`);
-                        break;
-                    case 'body':
-                        if (!body) body = {};
-                        body[remote.accepts[i].arg] = args[i];
-                        break;
-                    case 'query':
-                    default:
-                        // fix filter=[Object object]
-                        queryParameters[remote.accepts[i].arg] = JSON.stringify(args[i]);
-                        break;
+                case 'params':
+                    path = path.replace(new RegExp(`:${remote.accepts[i].arg}\/`, 'g'), `${args[i]}/`);
+                    path = path.replace(new RegExp(`:${remote.accepts[i].arg}$`, 'g'), `${args[i]}`);
+                    break;
+                case 'body':
+                    if (!body) {
+                        body = {};
+                    }
+                    body[remote.accepts[i].arg] = args[i];
+                    break;
+                case 'query':
+                default:
+                    // fix filter=[Object object]
+                    queryParameters[remote.accepts[i].arg] = JSON.stringify(args[i]);
+                    break;
                 }
             }
 
@@ -217,35 +237,39 @@ const createRemoteService = async function(app, serviceName, service) {
                 url.searchParams.append(queryParamsKeys[i], queryParameters[queryParamsKeys[i]]);
             }
 
-            
             const opts = {
                 method: remote.method,
                 headers: { 'Content-Type': 'application/json' }
             };
             // Fix error for GET requests with body
-            if (body) opts.body = JSON.stringify(body);
+            if (body) {
+                opts.body = JSON.stringify(body);
+            }
             let result = await fetch(url, opts);
-            
-            if (result.status === 200) return result.json();
+
+            if (result.status === 200) {
+                return result.json();
+            }
+
             return null;
-        }
-    })
+        };
+    });
 
-
-    
     app.services[serviceName] = service;
-}
+};
 
 export default async function(app, options) {
     app.services = {};
-    
+
     const directoryPath = path.join(__dirname, '../../../../../services');
     let serviceNames = fs.readdirSync(directoryPath);
     log('Service Names', serviceNames);
     if (options.acl) {
         let roleServiceName = options.acl.roleService || 'Role';
         let removed = _.remove(serviceNames, (s) => s === roleServiceName);
-        if (removed.length === 0) throw 'No Role Service Find';
+        if (removed.length === 0) {
+            throw 'No Role Service Find';
+        }
 
         let roleService = require(`../../../../../services/${roleServiceName}/${roleServiceName}.class.js`).default;
         if (roleService.__isRemote) {
@@ -262,9 +286,8 @@ export default async function(app, options) {
             if (service.__isRemote) {
                 return await createRemoteService(app, serviceName, service, options);
             }
+
             return await createService(app, serviceName, service, options);
         }
     }));
-
-    
 }
